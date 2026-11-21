@@ -27,7 +27,7 @@ jobs:
 
       - name: Retrieve nginx-proxy version
         id: nginx-proxy_version
-        run: echo "VERSION=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+        run: echo "VERSION=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
 
       - name: Retrieve docker-gen version
         id: docker-gen_version
@@ -38,13 +38,12 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            nginxproxy/nginx-proxy
+            ghcr.io/alex92233/nginx-proxy
           tags: |
             type=raw,value=${{ inputs.image_tag }},enable=${{ matrix.flavor == 'debian' }}
             type=raw,value=${{ inputs.image_tag }},suffix=-alpine,enable=${{ matrix.flavor == 'alpine' }}
             type=raw,value=${{ inputs.image_tag }},suffix=-dockergen,enable=${{ matrix.flavor == 'dockergen' }}
           labels: |
-            org.opencontainers.image.authors=Nicolas Duchon <nicolas.duchon@gmail.com> (@buchdag), Jason Wilder
             org.opencontainers.image.version=${{ steps.nginx-proxy_version.outputs.VERSION }}
           flavor: |
             latest=false
@@ -81,4 +80,4 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Images digests
-        run: echo ${{ steps.docker_build.outputs.digest }}
+        run: echo "${{ steps.docker_build.outputs.digest }}"
